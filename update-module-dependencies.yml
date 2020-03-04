@@ -1,0 +1,21 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: golang
+    tag: latest
+
+inputs:
+  - name: build-common
+  - name: source
+
+outputs:
+  - name: source
+
+caches:
+  - path: go-cache
+
+run:
+  path: build-common/update-module-dependencies.sh
