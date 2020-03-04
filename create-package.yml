@@ -1,0 +1,20 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: paketo/build-common-create-package
+    tag: latest
+
+inputs:
+  - name: build-common
+  - name: pack
+  - name: source
+
+caches:
+  - path: carton-cache
+  - path: go-cache
+
+run:
+  path: build-common/create-package.sh
