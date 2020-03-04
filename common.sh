@@ -1,8 +1,8 @@
 # shellcheck disable=SC2034
-ROOT="$(realpath "$(dirname "${BASH_SOURCE[0]}")"/..)"
+ROOT=$(realpath "$(dirname "${BASH_SOURCE[0]}")"/..)
 
-if [[ -d ${PWD}/go-cache ]]; then
-  export GOPATH=${PWD}/go-cache
+if [[ -d "${ROOT}"/go-cache ]]; then
+  export GOPATH="${ROOT}"/go-cache
 fi
 
 if [[ -d "${ROOT}"/pack ]]; then
