@@ -14,7 +14,7 @@ go mod tidy
 git add go.mod go.sum
 git checkout -- .
 
-git diff --exit-code || exit
+git diff --cached --exit-code || exit
 
 git \
   -c user.name='Paketo Robot' \
