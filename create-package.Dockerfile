@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /tmp/crane /usr/local/bin
-COPY --from=build /tmp/yj /usr/local/bin
 
 RUN mkdir -p /root/.docker \
  && echo "{}" > /root/.docker/config.json
