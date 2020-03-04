@@ -12,6 +12,9 @@ inputs:
   - name: pack
   - name: source
 
+outputs:
+  - name: image
+
 caches:
   - path: carton-cache
   - path: go-cache

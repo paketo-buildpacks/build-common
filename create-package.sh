@@ -20,19 +20,11 @@ package \
   --version "${VERSION}"
 
 printf "➜ Creating Package\n"
-yj -tj < "${ROOT}"/buildpack/buildpack.toml | \
-  jq "{
-    buildpack: {
-      uri: \"${ROOT}/buildpack\"
-    },
-    stacks: .stacks
-  }" | yj -jt > "${ROOT}"/package.toml
+printf '[buildpack]\nuri = "%s/buildpack"' "${ROOT}" > "${ROOT}"/package.toml
 pack \
   create-package \
   localhost:5000/package \
   -p "${ROOT}"/package.toml \
   --publish
 crane pull localhost:5000/package "${ROOT}"/image/image.tar
-
-printf "➜ Creating Image Tag %s\n" "${VERSION}"
 printf "%s" "${VERSION}" > "${ROOT}"/image/tags
