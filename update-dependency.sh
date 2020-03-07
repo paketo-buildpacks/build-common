@@ -27,7 +27,7 @@ GO111MODULE=on go get -ldflags='-s -w' github.com/paketoio/libpak/cmd/dependency
 printf "➜ Updating Dependency\n"
 dependency \
   --buildpack-toml "${ROOT}"/source/buildpack.toml \
-  --name "${DEPENDENCY}" \
+  --id "${DEPENDENCY}" \
   --version-pattern "${VERSION_PATTERN}" \
   --version "$(version)" \
   --uri "$(uri)" \
