@@ -9,7 +9,7 @@ VERSION=$(cat "${ROOT}"/source/.git/ref)
 VERSION=${VERSION:1}
 
 printf "➜ Building Packager\n"
-GO111MODULE=on GOPRIVATE="*" go get -ldflags="-s -w" github.com/paketoio/libpak/cmd/package
+GO111MODULE=on GOPRIVATE="*" go get -ldflags="-s -w" github.com/paketo-buildpacks/libpak/cmd/package
 
 printf "➜ Building Buildpack\n"
 package \

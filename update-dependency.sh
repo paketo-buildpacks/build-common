@@ -22,7 +22,7 @@ version() {
 
 
 printf "➜ Building Dependency Updater\n"
-GO111MODULE=on GOPRIVATE="*" go get -ldflags='-s -w' github.com/paketoio/libpak/cmd/dependency
+GO111MODULE=on GOPRIVATE="*" go get -ldflags='-s -w' github.com/paketo-buildpacks/libpak/cmd/dependency
 
 printf "➜ Updating Dependency\n"
 dependency \
