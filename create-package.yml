@@ -4,7 +4,7 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: gcr.io/packeto-buildpacks/build-common-create-package
+    repository: gcr.io/paketo-buildpacks/build-common-create-package
     tag: latest
 
 inputs:
