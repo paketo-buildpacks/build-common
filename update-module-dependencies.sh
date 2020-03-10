@@ -8,7 +8,7 @@ source "$(dirname "$0")"/common.sh
 cd "${ROOT}"/source
 
 rm go.sum
-GOPRIVATE="*" go get -u all
+GOPRIVATE="*" go get -u ./...
 go mod tidy
 
 git add go.mod go.sum
