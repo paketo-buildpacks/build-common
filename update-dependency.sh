@@ -20,7 +20,6 @@ version() {
 # shellcheck disable=SC1090
 [ -f "${ROOT}"/source/scripts/update-dependency.sh ] && source "${ROOT}"/source/scripts/update-dependency.sh
 
-
 printf "➜ Building Dependency Updater\n"
 GO111MODULE=on GOPRIVATE="*" go get -ldflags='-s -w' github.com/paketo-buildpacks/libpak/cmd/dependency
 
