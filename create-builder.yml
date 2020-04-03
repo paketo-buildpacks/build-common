@@ -1,0 +1,23 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: gcr.io/paketo-buildpacks/build-common-create-builder
+    tag: latest
+
+inputs:
+  - name: build-common
+  - name: lifecycle
+  - name: pack
+  - name: source
+
+outputs:
+  - name: image
+
+caches:
+  - path: go-cache
+
+run:
+  path: build-common/create-builder.sh
