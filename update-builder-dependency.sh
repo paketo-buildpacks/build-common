@@ -12,7 +12,7 @@ printf "➜ Updating Dependency\n"
 update-builder-dependency \
   --builder-toml "${ROOT}"/source/builder.toml \
   --id "${DEPENDENCY}" \
-  --version "$(version)"
+  --version "$(cat "${ROOT}"/dependency/version)"
 
 cd "${ROOT}"/source
 
