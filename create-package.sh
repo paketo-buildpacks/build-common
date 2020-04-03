@@ -9,10 +9,10 @@ VERSION=$(cat "${ROOT}"/source/.git/ref)
 VERSION=${VERSION:1}
 
 printf "➜ Building Packager\n"
-GO111MODULE=on GOPRIVATE="*" go get -ldflags="-s -w" github.com/paketo-buildpacks/libpak/cmd/package
+GO111MODULE=on GOPRIVATE="*" go get -ldflags="-s -w" github.com/paketo-buildpacks/libpak/cmd/create-package
 
 printf "➜ Building Buildpack\n"
-package \
+create-package \
   --cache-location "${ROOT}"/carton-cache \
   --destination "${ROOT}"/buildpack \
   --include-dependencies \

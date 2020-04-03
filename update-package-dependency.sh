@@ -18,13 +18,13 @@ version() {
 }
 
 # shellcheck disable=SC1090
-[ -f "${ROOT}"/source/scripts/update-dependency.sh ] && source "${ROOT}"/source/scripts/update-dependency.sh
+[ -f "${ROOT}"/source/scripts/update-package-dependency.sh ] && source "${ROOT}"/source/scripts/update-package-dependency.sh
 
 printf "➜ Building Dependency Updater\n"
-GO111MODULE=on GOPRIVATE="*" go get -ldflags='-s -w' github.com/paketo-buildpacks/libpak/cmd/dependency
+GO111MODULE=on GOPRIVATE="*" go get -ldflags='-s -w' github.com/paketo-buildpacks/libpak/cmd/update-package-dependency
 
 printf "➜ Updating Dependency\n"
-dependency \
+update-package-dependency \
   --buildpack-toml "${ROOT}"/source/buildpack.toml \
   --id "${DEPENDENCY}" \
   --version-pattern "${VERSION_PATTERN}" \
