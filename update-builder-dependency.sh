@@ -16,7 +16,7 @@ update-builder-dependency \
 
 cd "${ROOT}"/source
 
-git add buildpack.toml
+git add builder.toml
 git checkout -- .
 
 git \
