@@ -19,6 +19,8 @@ cd "${ROOT}"/source
 git add builder.toml
 git checkout -- .
 
+git diff --cached --exit-code &> /dev/null && exit
+
 git \
   -c user.name='Paketo Robot' \
   -c user.email='robot@paketo.io' \
