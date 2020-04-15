@@ -22,9 +22,9 @@ create-package \
 printf "➜ Creating Package\n"
 printf '[buildpack]\nuri = "%s/buildpack"' "${ROOT}" > "${ROOT}"/package.toml
 pack \
-  create-package \
+  package-buildpack \
   localhost:5000/package \
-  -p "${ROOT}"/package.toml \
+  --package-config "${ROOT}"/package.toml \
   --publish
 crane pull localhost:5000/package "${ROOT}"/image/image.tar
 printf "%s" "${VERSION}" > "${ROOT}"/image/tags
