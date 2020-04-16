@@ -8,12 +8,11 @@ source "$(dirname "$0")"/common.sh
 VERSION=$(cat "${ROOT}"/dependency/version)
 
 printf "➜ Building Dependency Updater\n"
-GO111MODULE=on GOPRIVATE="*" go get -ldflags='-s -w' github.com/paketo-buildpacks/libpak/cmd/update-builder-dependency
+GO111MODULE=on GOPRIVATE="*" go get -ldflags='-s -w' github.com/paketo-buildpacks/libpak/cmd/update-lifecycle-dependency
 
 printf "➜ Updating Dependency\n"
-update-builder-dependency \
+update-lifecycle-dependency \
   --builder-toml "${ROOT}"/source/builder.toml \
-  --id "${DEPENDENCY}" \
   --version "${VERSION}"
 
 cd "${ROOT}"/source

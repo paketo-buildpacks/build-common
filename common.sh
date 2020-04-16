@@ -5,6 +5,10 @@ if [[ -d "${ROOT}"/go-cache ]]; then
   export PATH="${ROOT}"/go-cache/bin:${PATH}
 fi
 
+if [[ -d "${ROOT}"/pack-cache ]]; then
+  export PACK_HOME="${ROOT}"/pack-cache
+fi
+
 if [[ -d "${ROOT}"/pack ]]; then
   printf "➜ Expanding Pack\n"
   tar xzf "${ROOT}"/pack/pack-*.tgz -C "${ROOT}"/pack

@@ -9,7 +9,6 @@ VERSION=$(cat "${ROOT}"/source/.git/ref)
 VERSION=${VERSION:1}
 
 printf "➜ Creating Builder\n"
-printf '\n[lifecycle]\nuri = "%s"' "$(ls "${ROOT}"/lifecycle/lifecycle-*+linux.x86-64.tgz)" >> "${ROOT}"/source/builder.toml
 pack \
   create-builder \
   localhost:5000/builder \

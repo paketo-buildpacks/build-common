@@ -18,6 +18,7 @@ outputs:
 caches:
   - path: carton-cache
   - path: go-cache
+  - path: pack-cache
 
 run:
   path: build-common/create-package.sh
