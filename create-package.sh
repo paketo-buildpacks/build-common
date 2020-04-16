@@ -5,7 +5,7 @@ set -euo pipefail
 # shellcheck source=common.sh
 source "$(dirname "$0")"/common.sh
 
-VERSION=$(cat "${ROOT}"/source/.git/ref)
+VERSION=$(cat "${ROOT}"/source/.git/short_ref)
 VERSION=${VERSION:1}
 
 printf "➜ Building Packager\n"
