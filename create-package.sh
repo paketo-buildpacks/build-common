@@ -12,7 +12,7 @@ printf "➜ Building Packager\n"
 GO111MODULE=on GOPRIVATE="*" go get -ldflags="-s -w" github.com/paketo-buildpacks/libpak/cmd/create-package
 
 printf "➜ Building Buildpack\n"
-if [[ -n "${INCLUDE_DEPENDENCIES+x}" ]]; then
+if [[ "${INCLUDE_DEPENDENCIES}" == "true" ]]; then
   create-package \
     --cache-location "${ROOT}"/carton-cache \
     --destination "${ROOT}"/buildpack \
