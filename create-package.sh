@@ -12,12 +12,20 @@ printf "➜ Building Packager\n"
 GO111MODULE=on GOPRIVATE="*" go get -ldflags="-s -w" github.com/paketo-buildpacks/libpak/cmd/create-package
 
 printf "➜ Building Buildpack\n"
-create-package \
-  --cache-location "${ROOT}"/carton-cache \
-  --destination "${ROOT}"/buildpack \
-  --include-dependencies \
-  --source "${ROOT}"/source \
-  --version "${VERSION}"
+if [[ -n "${INCLUDE_DEPENDENCIES+x}" ]]; then
+  create-package \
+    --cache-location "${ROOT}"/carton-cache \
+    --destination "${ROOT}"/buildpack \
+    --include-dependencies \
+    --source "${ROOT}"/source \
+    --version "${VERSION}"
+else
+  create-package \
+    --cache-location "${ROOT}"/carton-cache \
+    --destination "${ROOT}"/buildpack \
+    --source "${ROOT}"/source \
+    --version "${VERSION}"
+fi
 
 printf "➜ Creating Package\n"
 printf '[buildpack]\nuri = "%s/buildpack"' "${ROOT}" > "${ROOT}"/package.toml
