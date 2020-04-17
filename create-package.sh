@@ -21,7 +21,6 @@ if [[ "${INCLUDE_DEPENDENCIES}" == "true" ]]; then
     --version "${VERSION}"
 else
   create-package \
-    --cache-location "${ROOT}"/carton-cache \
     --destination "${ROOT}"/buildpack \
     --source "${ROOT}"/source \
     --version "${VERSION}"
