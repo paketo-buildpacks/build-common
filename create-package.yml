@@ -24,4 +24,5 @@ run:
   path: build-common/create-package.sh
 
 params:
+  GOOGLE_APPLICATION_CREDENTIALS:
   INCLUDE_DEPENDENCIES:

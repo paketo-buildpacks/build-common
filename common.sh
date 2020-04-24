@@ -19,3 +19,10 @@ if command -v docker-registry &> /dev/null; then
   printf "➜ Starting Registry\n"
   docker-registry serve /etc/docker/registry/config.yml &> /dev/null &
 fi
+
+if [[ -n "${GOOGLE_APPLICATION_CREDENTIALS}" ]]; then
+  printf "➜ Configuring Google Application Credentials\n"
+  echo "${GOOGLE_APPLICATION_CREDENTIALS}" > "${ROOT}"/google-application-credentials.json
+  export GOOGLE_APPLICATION_CREDENTIALS="${ROOT}"/google-application-credentials.json
+fi
+
