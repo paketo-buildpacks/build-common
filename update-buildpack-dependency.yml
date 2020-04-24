@@ -19,7 +19,7 @@ caches:
   - path: go-cache
 
 run:
-  path: build-common/update-package-dependency.sh
+  path: build-common/update-buildpack-dependency.sh
 
 params:
   DEPENDENCY:
