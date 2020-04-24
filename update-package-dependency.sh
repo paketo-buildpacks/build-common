@@ -17,8 +17,9 @@ if [[ -e "${ROOT}"/source/builder.toml ]]; then
     --id "${DEPENDENCY}" \
     --version "${VERSION}"
 fi
-if [[ -e "${ROOT}"/source/package.toml ]]; then
+if [[ -e "${ROOT}"/source/buildpack.toml ]]; then
   update-package-dependency \
+    --buildpack-toml "${ROOT}"/source/buildpack.toml \
     --package-toml "${ROOT}"/source/package.toml \
     --id "${DEPENDENCY}" \
     --version "${VERSION}"
@@ -27,7 +28,7 @@ fi
 cd "${ROOT}"/source
 
 [[ -e "${ROOT}"/source/builder.toml ]] && git add builder.toml
-[[ -e "${ROOT}"/source/package.toml ]] && git add package.toml
+[[ -e "${ROOT}"/source/buildpack.toml ]] && git add buildpack.toml package.toml
 git checkout -- .
 
 git \
