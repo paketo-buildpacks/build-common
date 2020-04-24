@@ -17,7 +17,7 @@ if [[ -e "${ROOT}"/source/builder.toml ]]; then
     --id "${DEPENDENCY}" \
     --version "${VERSION}"
 fi
-if [[ -e "${ROOT}"/source/builder.toml ]]; then
+if [[ -e "${ROOT}"/source/package.toml ]]; then
   update-package-dependency \
     --package-toml "${ROOT}"/source/package.toml \
     --id "${DEPENDENCY}" \
