@@ -27,7 +27,11 @@ else
 fi
 
 printf "➜ Creating Package\n"
-printf '[buildpack]\nuri = "%s/buildpack"' "${ROOT}" > "${ROOT}"/package.toml
+if [[ -e "${ROOT}"/source/package.toml ]]; then
+  cat "${ROOT}"/source/package.toml > "${ROOT}"/package.toml
+fi
+printf '[buildpack]\nuri = "%s/buildpack"' "${ROOT}" >> "${ROOT}"/package.toml
+
 pack \
   package-buildpack \
   localhost:5000/package \
