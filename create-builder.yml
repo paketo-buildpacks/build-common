@@ -21,3 +21,6 @@ caches:
 
 run:
   path: build-common/create-builder.sh
+
+params:
+  GOOGLE_APPLICATION_CREDENTIALS:
