@@ -12,7 +12,7 @@ printf "➜ Creating Builder\n"
 pack \
   create-builder \
   localhost:5000/builder \
-  --builder-config "${ROOT}"/source/builder.toml \
+  --config "${ROOT}"/source/builder.toml \
   --publish
 crane pull localhost:5000/builder "${ROOT}"/image/image.tar
 printf "%s" "${VERSION}" > "${ROOT}"/image/tags
