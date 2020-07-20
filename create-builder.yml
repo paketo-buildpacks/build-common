@@ -8,16 +8,16 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: build-common
-  - name: pack
-  - name: source
+- name: build-common
+- name: pack
+- name: source
 
 outputs:
-  - name: image
+- name: image
 
 caches:
-  - path: go-cache
-  - path: pack-cache
+- path: go-cache
+- path: pack-cache
 
 run:
   path: build-common/create-builder.sh

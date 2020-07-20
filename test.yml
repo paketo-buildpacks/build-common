@@ -8,11 +8,11 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: build-common
-  - name: source
+- name: build-common
+- name: source
 
 caches:
-  - path: go-cache
+- path: go-cache
 
 run:
   path: build-common/test.sh

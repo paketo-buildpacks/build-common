@@ -8,15 +8,15 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: build-common
-  - name: image
-  - name: source
+- name: build-common
+- name: image
+- name: source
 
 outputs:
-  - name: source
+- name: source
 
 caches:
-  - path: go-cache
+- path: go-cache
 
 run:
   path: build-common/update-image-dependency.sh

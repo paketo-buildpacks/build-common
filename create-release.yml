@@ -4,19 +4,15 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: golang
+    repository: gcr.io/paketo-buildpacks/build-common-create-release
     tag: latest
 
 inputs:
 - name: build-common
-- name: lifecycle
 - name: source
 
 outputs:
-- name: source
-
-caches:
-- path: go-cache
+- name: release
 
 run:
-  path: build-common/update-lifecycle-dependency.sh
+  path: build-common/create-release.sh

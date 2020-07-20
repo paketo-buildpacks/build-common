@@ -8,17 +8,17 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: build-common
-  - name: pack
-  - name: source
+- name: build-common
+- name: pack
+- name: source
 
 outputs:
-  - name: image
+- name: image
 
 caches:
-  - path: carton-cache
-  - path: go-cache
-  - path: pack-cache
+- path: carton-cache
+- path: go-cache
+- path: pack-cache
 
 run:
   path: build-common/create-package.sh
