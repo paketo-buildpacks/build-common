@@ -5,6 +5,7 @@ set -euo pipefail
 # shellcheck source=common.sh
 source "$(dirname "$0")"/common.sh
 
+DIGEST=$(cat "${ROOT}/source/digest")
 CONFIG=$(tar xOf "${ROOT}/source/image.tar" manifest.json | jq -r '.[].Config')
 PAYLOAD=$(tar xOf "${ROOT}/source/image.tar" "$CONFIG" | jq -r '.config.Labels."io.buildpacks.buildpackage.metadata"')
 PRIMARY=$(echo "${PAYLOAD}" | jq -r '.id')
@@ -25,12 +26,13 @@ done
 printf "%s %s" "${NAME}" "${VERSION}" > "${ROOT}"/release/name
 printf "v%s" "${VERSION}" > "${ROOT}"/release/tag
 
-printf "## Dependencies\n| Name | Version |\n| :--- | :------ |\n%s\n"  \
+printf "##Digest\n%s\n## Dependencies\n| Name | Version |\n| :--- | :------ |\n%s\n"  \
+  "${DIGEST}" \
   "$(echo "${DEPENDENCIES[@]}" | jq -r --slurp 'sort_by(.name) | .[] | "| \(.name) | `\(.version)` |"')" \
   > "${ROOT}"/release/body
 
 echo "${DEPENDENCIES[@]}" | jq -r --slurp \
-  --arg DIGEST "$(cat "${ROOT}/source/digest")" \
+  --arg DIGEST "${DIGEST}" \
   --arg NAME "${NAME}" \
   --arg VERSION "${VERSION}" \
   'sort_by(.id) |  { "digest": $DIGEST, "name": $NAME, "version": $VERSION, "dependencies": . }' \
