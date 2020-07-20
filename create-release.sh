@@ -26,7 +26,7 @@ done
 printf "%s %s" "${NAME}" "${VERSION}" > "${ROOT}"/release/name
 printf "v%s" "${VERSION}" > "${ROOT}"/release/tag
 
-printf "## Digest\n`%s`\n\n## Dependencies\n| Name | Version |\n| :--- | :------ |\n%s\n"  \
+printf "## Digest\n\`%s\`\n\n## Dependencies\n| Name | Version |\n| :--- | :------ |\n%s\n"  \
   "${DIGEST}" \
   "$(echo "${DEPENDENCIES[@]}" | jq -r --slurp 'sort_by(.name) | .[] | "| \(.name) | `\(.version)` |"')" \
   > "${ROOT}"/release/body
