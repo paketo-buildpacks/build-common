@@ -24,14 +24,14 @@ done
 
 printf "%s %s" "${NAME}" "${VERSION}" > "${ROOT}"/release/name
 printf "v%s" "${VERSION}" > "${ROOT}"/release/tag
-printf "v%s" "${VERSION}" > "${ROOT}"/release/commitish
 
 printf "## Dependencies\n| Name | Version |\n| :--- | :------ |\n%s\n"  \
-  "$(echo "${DEPENDENCIES[@]}" | jq -r --slurp 'sort_by(.name) | .[] | "| \(.name) | \(.version) |"')" \
+  "$(echo "${DEPENDENCIES[@]}" | jq -r --slurp 'sort_by(.name) | .[] | "| \(.name) | `\(.version)` |"')" \
   > "${ROOT}"/release/body
 
 echo "${DEPENDENCIES[@]}" | jq -r --slurp \
+  --arg DIGEST "$(cat "${ROOT}/source/digest")" \
   --arg NAME "${NAME}" \
   --arg VERSION "${VERSION}" \
-  'sort_by(.id) |  { "name": $NAME, "version": $VERSION, "dependencies": . }' \
+  'sort_by(.id) |  { "digest": $DIGEST, "name": $NAME, "version": $VERSION, "dependencies": . }' \
   > "${ROOT}"/release/manifest.json
