@@ -6,14 +6,14 @@ set -euo pipefail
 source "$(dirname "$0")"/common.sh
 
 DIGEST=$(cat "${ROOT}/source/digest")
-CONFIG=$(tar xOf "${ROOT}/source/image.tar" manifest.json | jq -r '.[].Config')
-PAYLOAD=$(tar xOf "${ROOT}/source/image.tar" "$CONFIG" | jq -r '.config.Labels."io.buildpacks.buildpackage.metadata"')
+CONFIG=$(tar xOf "${ROOT}"/source/image.tar manifest.json | jq -r '.[].Config')
+PAYLOAD=$(tar xOf "${ROOT}"/source/image.tar "${CONFIG}" | jq -r '.config.Labels."io.buildpacks.buildpackage.metadata"')
 PRIMARY=$(echo "${PAYLOAD}" | jq -r '.id')
 
 DEPENDENCIES=()
 
-for LAYER in $(tar tf "${ROOT}/source/image.tar" --wildcards "*.tar.gz"); do
-  PAYLOAD=$(tar xOf "${ROOT}/source/image.tar" "${LAYER}" | tar xzOf - --absolute-names --wildcards "/cnb/buildpacks/*/*/buildpack.toml" | yj -tj)
+for LAYER in $(tar tf "${ROOT}"/source/image.tar --wildcards "*.tar.gz"); do
+  PAYLOAD=$(tar xOf "${ROOT}"/source/image.tar "${LAYER}" | tar xzOf - --absolute-names --wildcards "/cnb/buildpacks/*/*/buildpack.toml" | yj -tj)
 
   if [[ "${PRIMARY}" == "$(echo "${PAYLOAD}" | jq -r '.buildpack.id')" ]]; then
     NAME=$(echo "${PAYLOAD}" | jq -r '.buildpack.name')
