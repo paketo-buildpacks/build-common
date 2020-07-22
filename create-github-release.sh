@@ -5,35 +5,92 @@ set -euo pipefail
 # shellcheck source=common.sh
 source "$(dirname "$0")"/common.sh
 
-DIGEST=$(cat "${ROOT}/source/digest")
-CONFIG=$(tar xOf "${ROOT}"/source/image.tar manifest.json | jq -r '.[].Config')
-PAYLOAD=$(tar xOf "${ROOT}"/source/image.tar "${CONFIG}" | jq -r '.config.Labels."io.buildpacks.buildpackage.metadata"')
-PRIMARY=$(echo "${PAYLOAD}" | jq -r '.id')
+CONFIG=$(tar xOf "${ROOT}"/source/image.tar manifest.json \
+         | jq -r '.[].Config')
+PRIMARY=$(tar xOf "${ROOT}"/source/image.tar "${CONFIG}" \
+          | jq -r '.config.Labels."io.buildpacks.buildpackage.metadata" | fromjson | .id')
 
-DEPENDENCIES=()
+PAYLOAD='{}'
+PAYLOAD=$(jq -n \
+          --argjson payload "${PAYLOAD}" \
+          --arg digest "$(cat "${ROOT}/source/digest")" \
+          '$payload | .digest = $digest')
 
 for LAYER in $(tar tf "${ROOT}"/source/image.tar --wildcards "*.tar.gz"); do
-  PAYLOAD=$(tar xOf "${ROOT}"/source/image.tar "${LAYER}" | tar xzOf - --absolute-names --wildcards "/cnb/buildpacks/*/*/buildpack.toml" | yj -tj)
+  BUILDPACK=$(tar xOf "${ROOT}"/source/image.tar "${LAYER}" \
+              | tar xzOf - --absolute-names --wildcards "/cnb/buildpacks/*/*/buildpack.toml" \
+              | yj -tj)
 
-  if [[ "${PRIMARY}" == "$(echo "${PAYLOAD}" | jq -r '.buildpack.id')" ]]; then
-    NAME=$(echo "${PAYLOAD}" | jq -r '.buildpack.name')
-    VERSION=$(echo "${PAYLOAD}" | jq -r '.buildpack.version')
+  if [[ "${PRIMARY}" == "$(jq -n -r --argjson buildpack "${BUILDPACK}" '$buildpack.buildpack.id')" ]]; then
+    PAYLOAD=$(jq -n \
+              --argjson payload "${PAYLOAD}" \
+              --argjson buildpack "${BUILDPACK}" \
+              '$payload | .primary = $buildpack')
+  else
+    PAYLOAD=$(jq -n \
+              --argjson payload "${PAYLOAD}" \
+              --argjson buildpack "${BUILDPACK}" \
+              '$payload | .buildpacks += [ $buildpack ]')
   fi
-
-  DEPENDENCIES+=( "$(echo "${PAYLOAD}" | jq -r '.metadata.dependencies[]?')" )
 done
 
-printf "%s %s" "${NAME}" "${VERSION}" > "${ROOT}"/release/name
-printf "v%s" "${VERSION}" > "${ROOT}"/release/tag
+printf "%s %s" \
+       "$(jq -n -r --argjson payload "${PAYLOAD}" '$payload | .primary.buildpack.id')" \
+       "$(jq -n -r --argjson payload "${PAYLOAD}" '$payload | .primary.buildpack.version')" \
+       > "${ROOT}"/release/name
+printf "v%s" \
+       "$(jq -n -r --argjson payload "${PAYLOAD}" '$payload | .primary.buildpack.version')" \
+       > "${ROOT}"/release/tag
 
-printf "## Digest\n\`%s\`\n\n## Dependencies\n| Name | Version |\n| :--- | :------ |\n%s\n"  \
-  "${DIGEST}" \
-  "$(echo "${DEPENDENCIES[@]}" | jq -r --slurp 'sort_by(.name) | .[] | "| \(.name) | `\(.version)` |"')" \
-  > "${ROOT}"/release/body
-
-echo "${DEPENDENCIES[@]}" | jq -r --slurp \
-  --arg DIGEST "${DIGEST}" \
-  --arg NAME "${NAME}" \
-  --arg VERSION "${VERSION}" \
-  'sort_by(.id) |  { "digest": $DIGEST, "name": $NAME, "version": $VERSION, "dependencies": . }' \
-  > "${ROOT}"/release/manifest.json
+jq -n -r --argjson payload "${PAYLOAD}" '$payload | [
+  "## Digest",
+  "`\(.digest)`",
+  "",
+  ( select(.primary.stacks) | [
+    "## Stacks",
+    ( .primary.stacks | sort_by(.id) | map("- `\(.id)`")),
+    ""
+  ]),
+  ( select(.primary.metadata.dependencies) | [
+    "## Dependencies",
+    "Name | Version | SHA256",
+    ":--- | :------ | :-----",
+    ( .primary.metadata.dependencies | sort_by(.name) | map("\(.name) | `\(.version)` | `\(.sha256)`")),
+    ""
+  ]),
+  ( select(.primary.order) | [
+    "## Order Definitions",
+    ( .primary.order | map([
+      "ID | Version | Optional",
+      ":- | :------ | :-------",
+      ( .group | map("`\(.id)` | `\(.version)` | `\(.optional)`") ),
+      ""
+    ]))
+  ]),
+  ( select(.buildpacks) | [
+    ( .buildpacks | map([
+      "# `\(.buildpack.id) \(.buildpack.version)`",
+      ( select(.stacks) | [
+        "## Stacks",
+        ( .stacks | sort_by(.id) | map("- `\(.id)`")),
+        ""
+      ]),
+      ( select(.metadata.dependencies) | [
+        "## Dependencies",
+        "Name | Version | SHA256",
+        ":--- | :------ | :-----",
+        ( .metadata.dependencies | sort_by(.name) | map("\(.name) | `\(.version)` | `\(.sha256)`")),
+        ""
+      ]),
+      ( select(.order) | [
+        "## Order Definitions",
+        ( .order | map([
+          "ID | Version | Optional",
+          ":- | :------ | :-------",
+          ( .group | map("`\(.id)` | `\(.version)` | `\(.optional // false)`") ),
+          ""
+        ]))
+      ])
+    ]))
+  ])
+] | flatten | join("\n")' > "${ROOT}"/release/body
