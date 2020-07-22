@@ -34,7 +34,8 @@ printf '[buildpack]\nuri = "%s/buildpack"' "${ROOT}" >> "${ROOT}"/package.toml
 
 pack \
   package-buildpack \
-  "${ROOT}"/image/image.tar \
+  localhost:5000/package \
   --config "${ROOT}"/package.toml \
-  --format file
+  --publish
+crane pull localhost:5000/package "${ROOT}"/image/image.tar
 printf "%s" "${VERSION}" > "${ROOT}"/image/tags
