@@ -68,7 +68,7 @@ jq -n -r --argjson payload "${PAYLOAD}" '$payload | [
     ]))
   ]),
   ( select(.buildpacks) | [
-    ( .buildpacks | map([
+    ( .buildpacks | sort_by(.buildpack.id) | map([
       "# `\(.buildpack.id) \(.buildpack.version)`",
       ( select(.stacks) | [
         "## Stacks",
