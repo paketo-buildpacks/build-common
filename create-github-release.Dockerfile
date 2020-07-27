@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     curl \
  && rm -rf /var/lib/apt/lists/*
 
-RUN curl -L https://github.com/sclevine/yj/releases/download/v4.0.0/yj-linux > /tmp/yj \
+RUN curl -L https://github.com/sclevine/yj/releases/download/v5.0.0/yj-linux > /tmp/yj \
  && chmod +x /tmp/yj
 
 FROM ubuntu:bionic
