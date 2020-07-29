@@ -63,7 +63,7 @@ jq -n -r --argjson payload "${PAYLOAD}" '$payload | [
     ( .primary.order | map([
       "ID | Version | Optional",
       ":- | :------ | :-------",
-      ( .group | map("`\(.id)` | `\(.version)` | `\(.optional)`") ),
+      ( .group | map("`\(.id)` | `\(.version)` | `\(.optional // false)`") ),
       ""
     ]))
   ]),
