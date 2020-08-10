@@ -34,63 +34,97 @@ for LAYER in $(tar tf "${ROOT}"/source/image.tar --wildcards "*.tar.gz"); do
   fi
 done
 
-printf "%s %s" \
-       "$(jq -n -r --argjson payload "${PAYLOAD}" '$payload | .primary.buildpack.id')" \
-       "$(jq -n -r --argjson payload "${PAYLOAD}" '$payload | .primary.buildpack.version')" \
-       > "${ROOT}"/release/name
-printf "v%s" \
-       "$(jq -n -r --argjson payload "${PAYLOAD}" '$payload | .primary.buildpack.version')" \
-       > "${ROOT}"/release/tag
+# https://github.com/paketo-buildpacks/spring-boot/releases/tag/v2.6.0
 
-jq -n -r --argjson payload "${PAYLOAD}" '$payload | [
-  "## Digest",
-  "`\(.digest)`",
+jq -n -r \
+  --argjson payload "${PAYLOAD}" \
+  '$payload | "\(.primary.buildpack.name) \(.primary.buildpack.version)"' \
+  > "${ROOT}"/release/name
+
+jq -n -r \
+  --argjson payload "${PAYLOAD}" \
+  '$payload | "v\(.primary.buildpack.version)"' \
+  > "${ROOT}"/release/tag
+
+jq -n -r --argjson payload "${PAYLOAD}" '
+def id(b):
+  "**ID**: `\(b.buildpack.id)`"
+;
+
+def included_buildpackages(b): [
+  "#### Included Buildpackages:",
+  "Name | ID | Version",
+  ":--- | :- | :------",
+  ( b | sort_by(.buildpack.name | ascii_downcase) | map("\(.buildpack.name) | `\(.buildpack.id)` | `\(.buildpack.version)`") ),
+  ""
+];
+
+def stacks(s): [
+  "#### Supported Stacks:",
+  ( s | sort_by(.id | ascii_downcase) | map("- `\(.id)`") ),
+  ""
+];
+
+def default_dependency_versions(d): [
+  "#### Default Dependency Versions:",
+  "ID | Version",
+  ":- | :------",
+  ( d | to_entries | sort_by(.key | ascii_downcase) | map("`\(.key)` | `\(.value)`") ),
+  ""
+];
+
+def dependencies(d): [
+  "#### Dependencies:",
+  "Name | Version | SHA256",
+  ":--- | :------ | :-----",
+  ( d | sort_by(.name | ascii_downcase) | map("\(.name) | `\(.version)` | `\(.sha256)`")),
+  ""
+];
+
+def order_groupings(o): [
+  "<details>",
+  "<summary>Order Groupings</summary>",
   "",
-  ( select(.primary.stacks) | [
-    "## Stacks",
-    ( .primary.stacks | sort_by(.id) | map("- `\(.id)`")),
+  ( o | map([
+    "ID | Version | Optional",
+    ":- | :------ | :-------",
+    ( .group | map([ "`\(.id)` | `\(.version)`", ( select(.optional) | "| `\(.optional)`" ) ] | join(" ")) ),
     ""
-  ]),
-  ( select(.primary.metadata.dependencies) | [
-    "## Dependencies",
-    "Name | Version | SHA256",
-    ":--- | :------ | :-----",
-    ( .primary.metadata.dependencies | sort_by(.name) | map("\(.name) | `\(.version)` | `\(.sha256)`")),
-    ""
-  ]),
-  ( select(.primary.order) | [
-    "## Order Definitions",
-    ( .primary.order | map([
-      "ID | Version | Optional",
-      ":- | :------ | :-------",
-      ( .group | map("`\(.id)` | `\(.version)` | `\(.optional // false)`") ),
-      ""
-    ]))
-  ]),
-  ( select(.buildpacks) | [
-    ( .buildpacks | sort_by(.buildpack.id) | map([
-      "# `\(.buildpack.id) \(.buildpack.version)`",
-      ( select(.stacks) | [
-        "## Stacks",
-        ( .stacks | sort_by(.id) | map("- `\(.id)`")),
-        ""
-      ]),
-      ( select(.metadata.dependencies) | [
-        "## Dependencies",
-        "Name | Version | SHA256",
-        ":--- | :------ | :-----",
-        ( .metadata.dependencies | sort_by(.name) | map("\(.name) | `\(.version)` | `\(.sha256)`")),
-        ""
-      ]),
-      ( select(.order) | [
-        "## Order Definitions",
-        ( .order | map([
-          "ID | Version | Optional",
-          ":- | :------ | :-------",
-          ( .group | map("`\(.id)` | `\(.version)` | `\(.optional // false)`") ),
-          ""
-        ]))
-      ])
-    ]))
-  ])
-] | flatten | join("\n")' > "${ROOT}"/release/body
+  ])),
+  "</details>",
+  ""
+];
+
+def primary_buildpack(p): [
+  id(p.primary),
+  "**Digest**: `\(p.digest)`",
+  "",
+  ( select(p.buildpacks) | included_buildpackages(p.buildpacks) ),
+  ( select(p.primary.stacks) | stacks(p.primary.stacks) ),
+  ( select(p.primary.metadata."default-versions") | default_dependency_versions(p.primary.metadata."default-versions") ),
+  ( select(p.primary.metadata.dependencies) | dependencies(p.primary.metadata.dependencies) ),
+  ( select(p.primary.order) | order_groupings(p.primary.order) ),
+  ( select(p.buildpacks) | "---" ),
+  ""
+];
+
+def nested_buildpack(b): [
+  "<details>",
+  "<summary>\(b.buildpack.name) \(b.buildpack.version)</summary>",
+  "",
+  id(b),
+  "",
+  ( select(b.stacks) | stacks(b.stacks) ),
+  ( select(b.metadata."default-versions") | default_dependency_versions(b.metadata."default-versions") ),
+  ( select(b.metadata.dependencies) | dependencies(b.metadata.dependencies) ),
+  ( select(b.order) | order_groupings(b.order) ),
+  "---",
+  "",
+  "</details>",
+  ""
+];
+
+$payload | [
+  primary_buildpack(.),
+  ( select(.buildpacks) | [ .buildpacks | sort_by(.buildpack.name | ascii_downcase) | map(nested_buildpack(.)) ] )
+] | flatten | join("\n")' > "${ROOT}/release/body"
