@@ -34,8 +34,6 @@ for LAYER in $(tar tf "${ROOT}"/source/image.tar --wildcards "*.tar.gz"); do
   fi
 done
 
-# https://github.com/paketo-buildpacks/spring-boot/releases/tag/v2.6.0
-
 jq -n -r \
   --argjson payload "${PAYLOAD}" \
   '$payload | "\(.primary.buildpack.name) \(.primary.buildpack.version)"' \
