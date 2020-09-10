@@ -20,6 +20,15 @@ if command -v docker-registry &> /dev/null; then
   docker-registry serve /etc/docker/registry/config.yml &> /dev/null &
 fi
 
+if [[ -n "${DOCKER_REGISTRY_CREDENTIALS+x}" ]]; then
+  printf "➜ Configuring Docker Registry Credentials\n"
+  while IFS=$'\t' read -r SERVER USER PASSWORD; do
+    docker login --username "${USER}" --password "${PASSWORD}" "${SERVER}"
+  done < <(jq -n -r \
+    --argjson payload "${DOCKER_REGISTRY_CREDENTIALS}" \
+    '$payload | .credentials[] | [ .server, .username, .password ] | @tsv')
+fi
+
 if [[ -n "${GOOGLE_APPLICATION_CREDENTIALS+x}" ]]; then
   printf "➜ Configuring Google Application Credentials\n"
   echo "${GOOGLE_APPLICATION_CREDENTIALS}" > "${ROOT}"/google-application-credentials.json

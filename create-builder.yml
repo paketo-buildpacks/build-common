@@ -23,4 +23,5 @@ run:
   path: build-common/create-builder.sh
 
 params:
+  DOCKER_REGISTRY_CREDENTIALS:
   GOOGLE_APPLICATION_CREDENTIALS:
