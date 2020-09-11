@@ -22,11 +22,13 @@ fi
 
 if [[ -n "${DOCKER_REGISTRY_CREDENTIALS+x}" ]]; then
   printf "➜ Configuring Docker Registry Credentials\n"
-  while IFS=$'\t' read -r SERVER USER PASSWORD; do
-    docker login --username "${USER}" --password "${PASSWORD}" "${SERVER}"
-  done < <(jq -n -r \
+  mv "${HOME}/.docker/config.json" "${HOME}/.docker/config.json.orig"
+
+  jq -r \
     --argjson payload "${DOCKER_REGISTRY_CREDENTIALS}" \
-    '$payload | .credentials[] | [ .server, .username, .password ] | @tsv')
+    'reduce ($payload | .credentials[]) as $c (.; .auths += { ($c | .server): {auth: ("\($c | .username):\($c | .password)" | @base64)} })' \
+     < "${HOME}/.docker/config.json.orig" \
+     > "${HOME}/.docker/config.json"
 fi
 
 if [[ -n "${GOOGLE_APPLICATION_CREDENTIALS+x}" ]]; then
