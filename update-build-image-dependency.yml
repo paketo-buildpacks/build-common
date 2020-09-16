@@ -19,7 +19,4 @@ caches:
 - path: go-cache
 
 run:
-  path: build-common/update-image-dependency.sh
-
-params:
-  TYPE:
+  path: build-common/update-build-image-dependency.sh

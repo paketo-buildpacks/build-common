@@ -8,12 +8,11 @@ source "$(dirname "$0")"/common.sh
 VERSION=$(cat "${ROOT}"/image/version)
 
 printf "➜ Building Dependency Updater\n"
-GO111MODULE=on GOPRIVATE="*" go get -ldflags='-s -w' github.com/paketo-buildpacks/libpak/cmd/update-image-dependency
+GO111MODULE=on GOPRIVATE="*" go get -ldflags='-s -w' github.com/paketo-buildpacks/libpak/cmd/update-build-image-dependency
 
 printf "➜ Updating Dependency\n"
-update-image-dependency \
+update-build-image-dependency \
   --builder-toml "${ROOT}"/source/builder.toml \
-  --type "${TYPE}" \
   --version "${VERSION}"
 
 cd "${ROOT}"/source
@@ -26,4 +25,4 @@ git \
   -c user.email='robot@paketo.io' \
   commit \
   --signoff \
-  --message "Dependency Upgrade: ${TYPE} Image ${VERSION}"
+  --message "Dependency Upgrade: Build Image ${VERSION}"
